@@ -1,15 +1,21 @@
 #include <stdio.h>
 
-char aMayus(char *letra);
+void aMayus(char s[]);
 
 int main()
 {
-    char letra;
-    printf("%s", aMayus("Hola"));
+    char s[5] = "Hola";
+    aMayus(s);
+    printf("%s", s);
     return 0;
 }
 
-char aMayus(char *letra)
+void aMayus(char s[])
 {
-    return *letra & ~' ';
+    int i = 0;
+    while (s[i] != '\0')
+    {
+        s[i] = s[i] & ~' ';
+        i++;
+    }
 }
