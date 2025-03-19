@@ -1,0 +1,1 @@
+{"cpnts":[{"type":"Memory","cpntId":32,"top":371,"left":510.5,"label":"Memory","data":{"delay":0,"cells":[]}},{"type":"Registers","cpntId":33,"top":363,"left":1179,"label":"Registers","data":{"registers":["","","","","","","","","","","","","","","",""],"labels":["","","","","","","","","","","","","","","",""]}}],"links":[]}
