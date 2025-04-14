@@ -2,7 +2,7 @@
 ; [0]: cantidad de elementos del vector
 ; [1, 2, 3, 4]: máximo del vector
 ; [5]: cantidad de apariciones
-: [6]: base del vector 
+; [6]: base del vector 
 
 ; Ingresar el vector
         ; [0] = N
