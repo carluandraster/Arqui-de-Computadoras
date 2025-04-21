@@ -11,17 +11,17 @@
         JP POS
         JN NEG
         JZ FIN
-:POS    ADD EAX,EBX
+POS:    ADD EAX,EBX
         SUB ECX,1
         CMP ECX,0
         JZ FIN
         JP POS
-:NEG    SUB EAX,EBX
+NEG:    SUB EAX,EBX
         ADD ECX,1
         CMP ECX,0
         JZ FIN
         JN NEG
-:FIN    MOV [1],EAX
+FIN:    MOV [1],EAX
         MOV EDX,DS
         ADD EDX,1
         MOV CH,4
