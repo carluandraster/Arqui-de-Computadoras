@@ -133,19 +133,110 @@ FIN_SCAT:   MOV b[EAX], 0
 ; punteros con el puntero al primer carácter de cada string, utilizando -1 para marcar el fin.
 
 ; DOCUMENTACIÓN
-; [BP+8]: puntero a string
-; [BP+12]: caracter
-; [BP+16]: puntero a array de strings
+; [BP+8]: puntero a string (texto)
+; b[BP+12]: caracter c
+; [BP+13]: puntero a vector de strings (textos)
 ; EAX: puntero a caracter del string
+; b[EAX] = texto[i]
+; EBX: puntero a la cantidad de elementos del vector
+; ECX: puntero a elemento del vector textos
+; [ECX] = textos[j]
 
 SPLIT:      PUSH BP
             MOV BP, SP
             PUSH EAX
+            PUSH EBX
+            PUSH ECX
 
-            ; Si el caracter es justo el caracter nulo, no hay nada que hacer
-            CMP [BP+12],0
-            JZ FIN_SPLIT
+            ; Inicializar variables
+                MOV EAX, [BP+8]
+                MOV EBX, [BP+13]
+                SUB EBX, 4
+                MOV ECX, [BP+13]
+
+            ; Si el caracter es justo el caracter nulo, guardar puntero a string en vector
+            CMP b[BP+12],0
+            JNZ OTRO_SPLIT1
+                MOV [EBX], 1
+                MOV [ECX], [BP+8]
+            JMP FIN_SPLIT
             
-            MOV EAX, [BP+8]
             ; while (texto[i] == c)
-OTRO_SPLIT1: CMP b[EAX], [BP+12]
+OTRO_SPLIT1: CMP b[EAX], b[BP+12]
+            JNZ SIGUE_SPLIT1
+                MOV b[EAX], 0
+                ADD EAX, 1
+            JMP OTRO_SPLIT1
+            ; Primer append de textos
+SIGUE_SPLIT1: MOV [EBX], 1
+            MOV [ECX], EAX
+            ADD ECX, 4
+            ; while(texto[i] != '\0')
+OTRO_SPLIT2: CMP b[EAX], 0
+            JZ FIN_SPLIT
+                ; while(texto[i] == c)
+OTRO_SPLIT3:    CMP b[EAX], b[BP+12]
+                JNZ FIN_CIC_SPL
+                    MOV b[EAX], 0
+                    ADD EAX, 1
+                    ; if (texto[i] != c && texto[i] != '\0') then textos.append(&texto[i])
+                    CMP b[EAX], 0
+                    JZ FIN_SPLIT
+                    CMP b[EAX], b[BP+12]
+                    JNZ OTRO_SPLIT3
+                        ADD [EBX], 1
+                        MOV [ECX], EAX
+                        ADD ECX, 4
+FIN_CIC_SPL:    ADD EAX, 1
+            JMP OTRO_SPLIT2 ; Fin ciclo while 2
+
+FIN_SPLIT:  POP ECX
+            POP EBX
+            POP EAX
+            MOV SP, BP
+            POP BP
+            RET
+
+; STRIM: recibe un puntero a string como parámetro variable, y devuelve el string quitando los
+; “espacios” (white spaces) del comienzo y del final.
+
+; CODIFICACIÓN ASCII
+; espacio = 32
+; tabulación = 09
+
+; DOCUMENTACIÓN
+; [BP+8]: puntero a string (texto)
+; EAX, EBX: punteros a caracteres de texto (&texto[i], &texto[j])
+; b[EAX] = texto[i]
+; b[EBX] = texto[j]
+
+STRIM:      PUSH BP
+            MOV BP, SP
+            PUSH EAX
+            PUSH EBX
+
+            MOV EAX, [BP+8]
+            ; while (texto[i] != '\0')
+OTRO_STRIM1: CMP b[EAX], 0
+            JZ FIN_STRIM
+                ; if(texto[i] == ' ' || texto[i] == '   ') then propagar onda de corrimiento
+                CMP b[EAX], 32
+                JZ IF_STRIM
+                CMP b[EAX], 9
+                JZ IF_STRIM
+                JMP FIN_CIC_STRIM
+IF_STRIM:           MOV EBX, EAX
+                    ; while(texto[j] != '\0')
+OTRO_STRIM2:        CMP b[EBX], 0
+                    JZ FIN_CIC_STRIM
+                        MOV b[EBX], b[EBX+1]
+                        ADD EBX, 1
+                    JMP OTRO_STRIM2 ; Fin ciclo while
+FIN_CIC_STRIM:  ADD EAX, 1
+            JMP OTRO_STRIM1; Fin ciclo while
+
+FIN_STRIM:  POP EBX
+            POP EAX
+            MOV SP, BP
+            POP BP
+            RET
