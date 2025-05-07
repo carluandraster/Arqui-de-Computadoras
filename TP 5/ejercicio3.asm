@@ -48,3 +48,5 @@ FIN_STR_TO_INT: POP CX
             MOV SP, BP
             POP BP
             RET
+
+; b. Un número entero a su representación en string.
