@@ -31,7 +31,7 @@ SIGUE0:     ; Llamar a la función
             PUSH [DS]
             PUSH [DS + 4]
             CALL potencia
-            ADD SP, 4
+            ADD SP, 8
             MOV [8], EAX
         ; Mostrar resultado
             MOV EDX, DS
