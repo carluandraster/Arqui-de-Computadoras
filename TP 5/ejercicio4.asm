@@ -36,28 +36,33 @@ MAIN:   PUSH BP
         CMP BL, '-'
         JZ RESTA
         CMP BL, '*'
-        JZ MULTIPLICACION
+        JZ MULT
         CMP BL, '/'
-        JZ DIVISION
-        JNZ FIN
+        JZ DIVI
+        JNZ ERROR
 
 SUMA:   ADD [0], [4]
-        JMP Mostrar
+        JMP Mostr
 
 RESTA:  SUB [0], [4]
-        JMP Mostrar
+        JMP Mostr
 
-MULTIPLICACION: MUL [0], [4]
-        JMP Mostrar
+MULT:   MUL [0], [4]
+        JMP Mostr
 
-DIVISION:   DIV [0], [4]
-        JMP Mostrar
+DIVI:   DIV [0], [4]
+        JMP Mostr
 
-Mostrar:    MOV EDX, DS
+Mostr:  MOV EDX, DS
         MOV CL, 1
         MOV CH, 4
         MOV AL, 1
         SYS 2
+
+ERROR:  EXCEPTION EQU "Operacion invalida\n"
+        MOV EDX, KS
+        ADD EDX, EXCEPTION
+        SYS 4
 
 FIN:    MOV SP, BP
         POP BP
