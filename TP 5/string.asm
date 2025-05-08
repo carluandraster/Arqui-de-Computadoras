@@ -134,8 +134,8 @@ FIN_SCAT:   MOV b[EAX], 0
 
 ; DOCUMENTACIÓN
 ; [BP+8]: puntero a string (texto)
-; b[BP+12]: caracter c
-; [BP+13]: puntero a vector de strings (textos)
+; [BP+12]: caracter c
+; [BP+16]: puntero a vector de strings (textos)
 ; EAX: puntero a caracter del string
 ; b[EAX] = texto[i]
 ; EBX: puntero a la cantidad de elementos del vector
@@ -150,19 +150,19 @@ SPLIT:      PUSH BP
 
             ; Inicializar variables
                 MOV EAX, [BP+8]
-                MOV EBX, [BP+13]
+                MOV EBX, [BP+16]
                 SUB EBX, 4
-                MOV ECX, [BP+13]
+                MOV ECX, [BP+16]
 
             ; Si el caracter es justo el caracter nulo, guardar puntero a string en vector
-            CMP b[BP+12],0
+            CMP [BP+12],0
             JNZ OTRO_SPLIT1
                 MOV [EBX], 1
                 MOV [ECX], [BP+8]
             JMP FIN_SPLIT
             
             ; while (texto[i] == c)
-OTRO_SPLIT1: CMP b[EAX], b[BP+12]
+OTRO_SPLIT1: CMP b[EAX], [BP+12]
             JNZ SIGUE_SPLIT1
                 MOV b[EAX], 0
                 ADD EAX, 1
@@ -175,14 +175,14 @@ SIGUE_SPLIT1: MOV [EBX], 1
 OTRO_SPLIT2: CMP b[EAX], 0
             JZ FIN_SPLIT
                 ; while(texto[i] == c)
-OTRO_SPLIT3:    CMP b[EAX], b[BP+12]
+OTRO_SPLIT3:    CMP b[EAX], [BP+12]
                 JNZ FIN_CIC_SPL
                     MOV b[EAX], 0
                     ADD EAX, 1
                     ; if (texto[i] != c && texto[i] != '\0') then textos.append(&texto[i])
                     CMP b[EAX], 0
                     JZ FIN_SPLIT
-                    CMP b[EAX], b[BP+12]
+                    CMP b[EAX], [BP+12]
                     JNZ OTRO_SPLIT3
                         ADD [EBX], 1
                         MOV [ECX], EAX
