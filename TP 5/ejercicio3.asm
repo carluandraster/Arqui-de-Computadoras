@@ -32,7 +32,7 @@ NO_ES_NEGATIVO: MOV CL, 1
                 JMP OTRO_STI
             ; while(numero[i] != '\0')
 OTRO_STI:   CMP b[EBX], 0
-            JZ SIGUE
+            JZ SIGUE_STI
                 MUL EAX, 10
                 ; resultado += numero[i] & 0xF
                     MOV CH, b[EBX]
@@ -99,7 +99,7 @@ OTRO_ITS2:      CMP EAX, CH
                 SUB EAX, 1
                 JMP OTRO_ITS2
                 ; respuesta[esNegativo] := numero % 10 + 48
-                    DIV [BP+8], 10
+SIGUE_ITS2:         DIV [BP+8], 10
                     ADD AC, 48
                     MOV b[CH], AC
             JMP OTRO_ITS
