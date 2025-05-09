@@ -120,4 +120,8 @@ SIGUE:  MOV EDX, BP
         MOV CL, 1
         MOV AL, 1
         SYS 2
+
+        MOV SP, BP
+        POP BP
+        RET
         STOP
