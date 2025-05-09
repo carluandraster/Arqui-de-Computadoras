@@ -1,4 +1,5 @@
 \\INCLUDE "string.asm"
+\\INCLUDE "ejercicio3.asm"
 
 ; DOCUMENTACIÓN
 ; [BP-4]: numero. Es donde se guarda el resultado de la operacion
@@ -7,9 +8,8 @@
 ; [50]: cantidad de elementos del vector de abajo
 ; [DS+54]: vector de punteros a elementos de la operacion
 ; AC: variable de control
-; EEX: puntero a string
 ; EBX: puntero a signo
-; EFX: puntero al elemento del vector
+; EFX: puntero al elemento del vector -> [EFX]: texto
 
 MAIN:   PUSH BP
         MOV BP, SP
@@ -45,7 +45,7 @@ MAIN:   PUSH BP
         ; Recorrer vector de strings
             ; for(texto in textos)
             MOV AC, 0
-            CMP AC, [MAX_ELEM]
+OTRO:       CMP AC, [MAX_ELEM]
             JZ SIGUE
                 ; Si es el signo +, ir a sección suma
                 MOV EBX, KS
@@ -88,3 +88,36 @@ MAIN:   PUSH BP
                 JZ CASE_/
 
                 ; Sino, asumimos que es un número
+                PUSH [EFX]
+                CALL STR_TO_INT
+                ADD SP, 4
+                PUSH EAX
+                JMP FIN_CICLO
+
+CASE_+:         ADD [BP-4],[BP-8]
+                ADD SP, 4; Sacar de la pila el número
+                JMP FIN_CICLO
+
+CASE_-:         SUB [BP-4],[BP-8]
+                ADD SP, 4; Sacar de la pila el número
+                JMP FIN_CICLO
+
+CASE_*:         MUL [BP-4],[BP-8]
+                ADD SP, 4; Sacar de la pila el número
+                JMP FIN_CICLO
+
+CASE_/:         DIV [BP-4],[BP-8]
+                ADD SP, 4; Sacar de la pila el número
+                JMP FIN_CICLO
+
+FIN_CICLO:  ADD EFX, 4
+            JMP OTRO
+
+        ; Apuntar EDX a [BP-4]
+SIGUE:  MOV EDX, BP
+        SUB EDX, 4
+        MOV CH, 4
+        MOV CL, 1
+        MOV AL, 1
+        SYS 2
+        STOP
