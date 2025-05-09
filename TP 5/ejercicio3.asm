@@ -27,9 +27,9 @@ str_to_int: PUSH BP
             JNZ NO_ES_NEGATIVO
 ES_NEGATIVO:    MOV CL, -1
                 ADD EBX, 1
-                JMP OTRO
+                JMP OTRO_STI
 NO_ES_NEGATIVO: MOV CL, 1
-                JMP OTRO
+                JMP OTRO_STI
             ; while(numero[i] != '\0')
 OTRO_STI:   CMP b[EBX], 0
             JZ SIGUE
@@ -39,7 +39,7 @@ OTRO_STI:   CMP b[EBX], 0
                     ADD CH, 0xF
                     ADD EAX, CH
                 ADD EBX, 1
-            JMP OTRO
+            JMP OTRO_STI
 SIGUE_STI:  MUL EAX, CL
 FIN_STR_TO_INT: POP CX
             POP EBX
