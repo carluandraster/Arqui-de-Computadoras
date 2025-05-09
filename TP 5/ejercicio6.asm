@@ -49,11 +49,13 @@ FIN:    MOV SP, BP
 ; [BP+8]: puntero a string s
 ; EAX: puntero a caracter de s (s[i] = b[EAX]
 ; ECX: puntero a caracter de s (s[j] = b[ECX]
+; BH: registro de respuesta de esAlfabetico
 ; BL: booleano auxiliar (se pisa)
 
-esPalindroma:   MOV BP, SP
-                PUSH BP
+esPalindroma:   PUSH BP
+                MOV BP, SP
                 PUSH EAX
+                PUSH BH
                 PUSH ECX
 
                 ; i:= 0; j:= slen(s)-1
@@ -72,14 +74,36 @@ otro1_ep:       CMP EAX, ECX
                 JNP FIN_EP
                 CMP BL, 0
                 JZ FIN_EP
-otro2_ep:           CMP b[EAX], ' '
-                    JZ ENTRA2_EP
-                    CMP b[EAX], 9
-                    JZ ENTRA2_EP
-                    CMP b[EAX], '.'
-                    JZ ENTRA2_EP
-                    CMP b[EAX], ','
-                    JZ ENTRA2_EP
+                        ; while(!esAlfabetico(s[i]))
+otro2_ep:               PUSH b[EAX]
+                        CALL esAlfabetico
+                        ADD SP, 4
+                        CMP BH, 0
+                        JZ otro3_ep; Si el caracter no es alfabético, no hacer nada
+                                ADD EAX, 1
+                        JMP otro2_ep
+                        ; while(!esAlfabetico(s[j]))
+otro3_ep:               PUSH b[ECX]
+                        CALL esAlfabetico
+                        ADD SP, 4
+                        CMP BH, 0
+                        JZ sigue3_ep; Si el caracter no es alfabético, no hacer nada
+                                SUB ECX, 1
+                        JMP otro3_ep
+                        ; aux = s[i] == s[j]
+sigue3_ep:              PUSH b[EAX]
+                        PUSH b[ECX]
+                        CALL CMP_IGNORE_CASE
+                        ADD SP, 8
+                        ADD EAX, 1
+                        SUB ECX, 1
+                JMP otro1_ep
+FIN_EP:         POP ECX
+                POP BH
+                POP EAX
+                MOV SP, BP
+                POP BP
+                RET
 
 ; DOCUMENTACIÓN
 ; [BP+8]: caracter
@@ -123,3 +147,38 @@ FIN_EA:         POP CL
                 MOV SP, BP
                 POP BP
                 RET
+
+; DOCUMENTACIÓN
+; [BP+8], [BP+12]: caracteres a comparar
+; Compara 2 caracteres sin importar si es mayúscula o minúscula
+; BL: booleano (se pisa)
+; CH: [BP+8] en mayúscula
+; CL: [BP+12] en mayúscula
+CMP_IGNORE_CASE:        PUSH BP
+                        MOV BP, SP
+                        PUSH CX
+
+                        ; CH := upper_case([BP+8])
+                        PUSH [BP+8]
+                        CALL upper_case
+                        ADD SP, 4
+                        MOV CH, CL
+
+                        ; CL := upper_case([BP+12])
+                        PUSH [BP+12]
+                        CALL upper_case
+                        ADD SP, 4
+
+                        CMP CH, CL
+                        JZ Verdadero
+                        JNZ Falso
+
+Verdadero:              MOV BL, 1
+                        JMP FIN_CIC
+Falso:                  MOV BL, 0
+                        JMP FIN_CIC
+
+FIN_CIC:                POP CX
+                        MOV SP, BP
+                        POP BP
+                        RET
