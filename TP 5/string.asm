@@ -5,7 +5,7 @@
 ; el terminator) del string.
 
 ; DOCUMENTACIÓN
-; [BP + 8]: puntero a string
+; [BP+8]: puntero a string
 ; ECX: contador de caracteres
 ; EAX: puntero a caracter para recorrer el string
 SLEN:       PUSH BP
@@ -13,7 +13,7 @@ SLEN:       PUSH BP
             PUSH EAX
 
             MOV ECX, 0
-            MOV EAX, [BP + 8]
+            MOV EAX, [BP+8]
             ; while (cadena[i] != '\0')
 OTRO_SLEN:  CMP b[EAX], 0
             JP FIN_SLEN
@@ -31,8 +31,8 @@ FIN_SLEN:   POP EAX
 ; memoria a otra.
 
 ; DOCUMENTACIÓN
-; [BP + 8]: puntero a string destino de la copia (b)
-; [BP + 12]: puntero a string a copiar (a)
+; [BP+8]: puntero a string destino de la copia (b)
+; [BP+12]: puntero a string a copiar (a)
 ; EAX: puntero a caracter de a
 ; EBX: puntero a caracter de b
 ; b:= a
@@ -61,8 +61,8 @@ FIN_SCPY:   MOV EBX, 0
 ; hasta que exista una diferencia devolviendola en EAX o 0 si los strings son iguales.
 
 ; DOCUMENTACIÓN
-; [BP + 8]: puntero a string B
-; [BP + 12]: puntero a string A
+; [BP+8]: puntero a string B
+; [BP+12]: puntero a string A
 ; EBX: puntero a caracter de B
 ; EAX: puntero a caracter A
 ; EAX: registro de retorno
@@ -96,8 +96,8 @@ FIN_SCMP:   MOV EAX, b[EAX]
 ; del programador que a continuación del primer string no se pisen datos).
 
 ; DOCUMENTACIÓN
-; [BP + 8]: puntero a string A
-; [BP + 12]: puntero a string B
+; [BP+8]: puntero a string A
+; [BP+12]: puntero a string B
 ; EAX: puntero a un caracter de string A
 ; EBX: puntero a un caracter de string B
 
@@ -198,7 +198,7 @@ FIN_SPLIT:  POP ECX
             RET
 
 ; STRIM: recibe un puntero a string como parámetro variable, y devuelve el string quitando los
-; “espacios” (white spaces) del comienzo y del final.
+; espacios (white spaces) del comienzo y del final.
 
 ; CODIFICACIÓN ASCII
 ; espacio = 32
