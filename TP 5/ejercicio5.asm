@@ -94,19 +94,19 @@ OTRO:       CMP AC, [MAX_ELEM]
                 PUSH EAX
                 JMP FIN_CICLO
 
-CASE_+:         ADD [BP-4],[BP-8]
+CASE_+:         ADD [SP+4],[SP]
                 ADD SP, 4; Sacar de la pila el número
                 JMP FIN_CICLO
 
-CASE_-:         SUB [BP-4],[BP-8]
+CASE_-:         SUB [SP+4],[SP]
                 ADD SP, 4; Sacar de la pila el número
                 JMP FIN_CICLO
 
-CASE_*:         MUL [BP-4],[BP-8]
+CASE_*:         MUL [SP+4],[SP]
                 ADD SP, 4; Sacar de la pila el número
                 JMP FIN_CICLO
 
-CASE_/:         DIV [BP-4],[BP-8]
+CASE_/:         DIV [SP+4],[SP]
                 ADD SP, 4; Sacar de la pila el número
                 JMP FIN_CICLO
 
