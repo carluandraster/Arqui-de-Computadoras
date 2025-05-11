@@ -1,4 +1,4 @@
-\\INCLUDE "ejercicio3.asm"
+\\INCLUDE "../Ejercicio 3/conversor.asm"
 
 ; DOCUMENTACIÓN
 ; [BP+8]: cantidad de argumentos (argc = 3)
@@ -6,29 +6,34 @@
 ; [0]: opA
 ; BL: operacion
 ; [4]: opB
-; EAX: valor de retorno función str_to_int (ver ejercicio 3)
+; EAX: valor de retorno función str_to_int (ver ejercicio 3) y función auxiliar
 ; ECX: puntero a elemento de argv (ECX = &argv[i])
+
+EXCEPTION EQU "Operacion invalida\n"
 
 MAIN:   PUSH BP
         MOV BP, SP
+        
 
-        CMP [BP+8],3
+        CMP l[BP+8],3
         JNZ FIN
 
-        MOV ECX, [BP+12]
+        MOV ECX, l[BP+12]
         ; [0] := str_to_int(argv[0])
-            PUSH ECX
+            PUSH [ECX]
             CALL str_to_int
             ADD SP, 4
-            MOV [0], EAX
+            MOV l[DS], EAX
         ; BL := argv[1]
             ADD ECX, 4
-            MOV BL, b[ECX]
+            MOV EAX, [ECX]
+            MOV BL, b[EAX]
         ; [4] := str_to_int(argv[2])
             ADD ECX, 4
-            PUSH ECX
+            PUSH [ECX]
             CALL str_to_int
-            MOV [4], EAX
+            ADD SP, 4
+            MOV l[DS+4], EAX
         
         ; switch BL
         CMP BL, '+'
@@ -41,16 +46,16 @@ MAIN:   PUSH BP
         JZ DIVI
         JNZ ERROR
 
-SUMA:   ADD [0], [4]
+SUMA:   ADD l[DS], l[DS+4]
         JMP Mostr
 
-RESTA:  SUB [0], [4]
+RESTA:  SUB l[DS], l[DS+4]
         JMP Mostr
 
-MULT:   MUL [0], [4]
+MULT:   MUL l[DS], l[DS+4]
         JMP Mostr
 
-DIVI:   DIV [0], [4]
+DIVI:   DIV l[DS], l[DS+4]
         JMP Mostr
 
 Mostr:  MOV EDX, DS
@@ -58,9 +63,9 @@ Mostr:  MOV EDX, DS
         MOV CH, 4
         MOV AL, 1
         SYS 2
+        JMP FIN
 
-ERROR:  EXCEPTION EQU "Operacion invalida\n"
-        MOV EDX, KS
+ERROR:  MOV EDX, KS
         ADD EDX, EXCEPTION
         SYS 4
 
