@@ -9,7 +9,7 @@
 ; [0]: primer caracter del string
 ; BL: booleano que indica si el string es palíndromo
 
-;MAIN:   PUSH BP
+MAIN:   PUSH BP
         MOV BP, SP
 
         ; Ingresar string
@@ -78,7 +78,7 @@ otro2_ep:               PUSH b[EAX]
                         CALL esAlfabetico
                         ADD SP, 4
                         CMP BH, 0
-                        JZ otro3_ep; Si el caracter no es alfabético, no hacer nada
+                        JNZ otro3_ep; Si el caracter ya es alfabético, no hacer nada
                                 ADD EAX, 1
                         JMP otro2_ep
                         ; while(!esAlfabetico(s[j]))
@@ -86,7 +86,7 @@ otro3_ep:               PUSH b[ECX]
                         CALL esAlfabetico
                         ADD SP, 4
                         CMP BH, 0
-                        JZ sigue3_ep; Si el caracter no es alfabético, no hacer nada
+                        JNZ sigue3_ep; Si el caracter ya es alfabético, no hacer nada
                                 SUB ECX, 1
                         JMP otro3_ep
                         ; aux = s[i] == s[j]
