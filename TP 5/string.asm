@@ -16,7 +16,7 @@ SLEN:       PUSH BP
             MOV EAX, [BP+8]
             ; while (cadena[i] != '\0')
 OTRO_SLEN:  CMP b[EAX], 0
-            JP FIN_SLEN
+            JZ FIN_SLEN
                 ADD ECX, 1
                 ADD EAX, 1
             JMP OTRO_SLEN
