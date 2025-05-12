@@ -61,33 +61,35 @@ FIN_SCPY:   MOV EBX, 0
 ; hasta que exista una diferencia devolviendola en EAX o 0 si los strings son iguales.
 
 ; DOCUMENTACIÓN
-; [BP+8]: puntero a string B
-; [BP+12]: puntero a string A
+; [BP+8]: puntero a string A
+; [BP+12]: puntero a string B
 ; EBX: puntero a caracter de B
 ; EAX: puntero a caracter A
-; EAX: registro de retorno
+; ECX: registro de retorno (se pisa)
 
 SCMP:       PUSH BP
             MOV BP, SP
+            PUSH EAX
             PUSH EBX
+            PUSH EDX
 
-            MOV EAX, [BP+12]
-            MOV EBX, [BP+8]
+            MOV EBX, [BP+12]
+            MOV EAX, [BP+8]
             ; while ((a[i] > 0 || b[i] > 0) && a[i] == b[i])
 OTRO_SCMP:  CMP b[EAX], b[EBX]
             JNZ FIN_SCMP
-            CMP b[EAX], 0
-            JNZ SALTEAR
-            CMP b[EBX], 0
+            CMP b[EAX], 0; Si a[i] == b[i] y a[i] == '\0' entonces b[i] también es el caracter nulo
             JZ FIN_SCMP
             ; Avanzo
-SALTEAR:    ADD EAX, 1
-            ADD EBX, 1
+                ADD EAX, 1
+                ADD EBX, 1
             JMP OTRO_SCMP
-FIN_SCMP:   MOV EAX, b[EAX]
-            SUB EAX, b[EBX]
+FIN_SCMP:   MOV ECX, b[EAX]
+            SUB ECX, b[EBX]
 
+            POP EDX
             POP EBX
+            POP EAX
             MOV SP, BP
             POP BP
             RET
