@@ -1,16 +1,16 @@
-\\INCLUDE "string.asm"
+\\INCLUDE "../string.asm"
+
+; Declaración de constantes
+        MENSAJE1 EQU "Ingrese una frase:\n"
+        MENSAJE2 EQU "Es frase palindroma\n"
+        MENSAJE3 EQU "No es frase palindroma\n"
 
 ; DOCUMENTACIÓN
 ; [0]: primer caracter del string
 ; BL: booleano que indica si el string es palíndromo
 
-MAIN:   PUSH BP
+;MAIN:   PUSH BP
         MOV BP, SP
-
-        ; Declaración de constantes
-        MENSAJE1 EQU "Ingrese una frase:\n"
-        MENSAJE2 EQU "Es frase palindroma\n"
-        MENSAJE3 EQU "No es frase palindroma\n"
 
         ; Ingresar string
         MOV EDX, KS
@@ -26,7 +26,7 @@ MAIN:   PUSH BP
         ADD SP, 4
 
         ; Mostrar resultado
-        CMP BL, 0
+        CMP FL, 0
         JP TRUE
         JZ FALSE
 
@@ -47,15 +47,16 @@ FIN:    MOV SP, BP
 
 ; DOCUMENTACIÓN
 ; [BP+8]: puntero a string s
-; EAX: puntero a caracter de s (s[i] = b[EAX]
-; ECX: puntero a caracter de s (s[j] = b[ECX]
+; EAX: puntero a caracter de s (s[i] = b[EAX])
+; ECX: puntero a caracter de s (s[j] = b[ECX])
 ; BH: registro de respuesta de esAlfabetico
-; BL: booleano auxiliar (se pisa)
+; BL: resultado de una comparación
+; FL: booleano auxiliar (se pisa)
 
 esPalindroma:   PUSH BP
                 MOV BP, SP
                 PUSH EAX
-                PUSH BH
+                PUSH BX
                 PUSH ECX
 
                 ; i:= 0; j:= slen(s)-1
@@ -67,13 +68,11 @@ esPalindroma:   PUSH BP
                 SUB ECX, 1
 
                 ; aux := true (verdadero hasta que se demuestre lo contrario)
-                MOV BL, 1
+                MOV FL, 1
 
-                ; while (i<j && aux)
+                ; while (i<j)
 otro1_ep:       CMP EAX, ECX
-                JNP FIN_EP
-                CMP BL, 0
-                JZ FIN_EP
+                JNN FIN_EP
                         ; while(!esAlfabetico(s[i]))
 otro2_ep:               PUSH b[EAX]
                         CALL esAlfabetico
@@ -95,9 +94,15 @@ sigue3_ep:              PUSH b[EAX]
                         PUSH b[ECX]
                         CALL CMP_IGNORE_CASE
                         ADD SP, 8
+                        ; if b[EAX] != b[ECX] then aux := false; break
+                        CMP BL, 0
+                        JNZ sigueF_EP1
                         ADD EAX, 1
                         SUB ECX, 1
                 JMP otro1_ep
+
+sigueF_EP1:     MOV FL, 0
+
 FIN_EP:         POP ECX
                 POP BH
                 POP EAX
@@ -112,9 +117,8 @@ upper_case:     PUSH BP
                 MOV BP, SP
 
                 ; CL := [BP+8] & ~' '
-                MOV CL, ' '
-                NOT CL
-                AND CL, [BP+8]
+                MOV CL, [BP+8]
+                AND CL, 0xDF
                 
                 MOV SP, BP
                 POP BP
@@ -151,7 +155,10 @@ FIN_EA:         POP CL
 ; DOCUMENTACIÓN
 ; [BP+8], [BP+12]: caracteres a comparar
 ; Compara 2 caracteres sin importar si es mayúscula o minúscula
-; BL: booleano (se pisa)
+; BL: resultado (se pisa)
+; Si BL es positivo, [BP+8]>[BP+12]
+; Si BL es negativo, [BP+8]<[BP+12]
+; Si BL es 0, [BP+8]=[BP+12]
 ; CH: [BP+8] en mayúscula
 ; CL: [BP+12] en mayúscula
 CMP_IGNORE_CASE:        PUSH BP
@@ -168,15 +175,10 @@ CMP_IGNORE_CASE:        PUSH BP
                         PUSH [BP+12]
                         CALL upper_case
                         ADD SP, 4
-
-                        CMP CH, CL
-                        JZ Verdadero
-                        JNZ Falso
-
-Verdadero:              MOV BL, 1
-                        JMP FIN_CIC
-Falso:                  MOV BL, 0
-                        JMP FIN_CIC
+                        
+                        ; BL := CH-CL
+                        MOV BL, CH
+                        SUB BL, CL
 
 FIN_CIC:                POP CX
                         MOV SP, BP
