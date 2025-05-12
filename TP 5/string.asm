@@ -71,7 +71,6 @@ SCMP:       PUSH BP
             MOV BP, SP
             PUSH EAX
             PUSH EBX
-            PUSH EDX
 
             MOV EBX, [BP+12]
             MOV EAX, [BP+8]
@@ -87,7 +86,6 @@ OTRO_SCMP:  CMP b[EAX], b[EBX]
 FIN_SCMP:   MOV ECX, b[EAX]
             SUB ECX, b[EBX]
 
-            POP EDX
             POP EBX
             POP EAX
             MOV SP, BP
@@ -144,6 +142,13 @@ FIN_SCAT:   MOV b[EAX], 0
 ; ECX: puntero a elemento del vector textos
 ; [ECX] = textos[j]
 
+; LLAMADA A FUNCIÓN
+; PUSH textos
+; PUSH c
+; PUSH texto
+; CALL SPLIT
+; ADD SP, 12
+
 SPLIT:      PUSH BP
             MOV BP, SP
             PUSH EAX
@@ -185,7 +190,7 @@ OTRO_SPLIT3:    CMP b[EAX], [BP+12]
                     CMP b[EAX], 0
                     JZ FIN_SPLIT
                     CMP b[EAX], [BP+12]
-                    JNZ OTRO_SPLIT3
+                    JZ OTRO_SPLIT3
                         ADD [EBX], 1
                         MOV [ECX], EAX
                         ADD ECX, 4
