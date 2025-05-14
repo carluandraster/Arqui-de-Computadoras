@@ -6,11 +6,19 @@
 ; EAX: puntero auxiliar a un elemento del vector
 ; EBX: otro puntero a un elemento del vector
 
-MAIN:   MOV [0], 3
+J__ EQU 0
 
-        PUSH BP
+MAIN:   MOV [j__], 3
+        JMP _MAIN
+
+
+_MAIN:   PUSH BP
         MOV BP, SP
+        
 
+
+ 
+        
         MOV [4], 5
         ; [BP-4] := DS + 8
         PUSH DS
