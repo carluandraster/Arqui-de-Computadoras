@@ -65,3 +65,9 @@ funcion1:   PUSH BP
 
             ; vec[0] = 1
             MOV [BP+8],1
+
+            ;for (i = 1; i < z; i++) do vec[i] = vec[i-1] * i;
+            MOV EBX, [BP+8]
+            ADD EBX, 4
+            MOV [BP-8], 1
+OTRO:       CMP [BP-8],
