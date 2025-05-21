@@ -64,3 +64,4 @@ funcion1:   PUSH BP
             PUSH EBX
 
             ; vec[0] = 1
+            MOV [BP+8],1
