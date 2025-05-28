@@ -25,8 +25,6 @@ crear_nodo: PUSH BP
             PUSH 8
             CALL ALLOC
             ADD SP, 4
-            CMP EAX, NULL
-            JZ FIN_CREAR
 
             MOV [EAX+VALOR], [BP+8]
             MOV [EAX+SIG], null
@@ -59,12 +57,12 @@ inserta_ordenado:   PUSH BP
                     PUSH ECX
 
                     MOV EAX, [BP+8]
+                    MOV ECX, [BP+12]
                     
 OTRO_INSORD:        CMP [EAX], null
                     JZ SIGUE_INSORD
 
                     MOV EBX, [EAX]
-                    MOV ECX, [BP+12]
 
                     CMP [EBX+VALOR], [ECX+VALOR]
                     JNN SIGUE_INSORD
@@ -72,8 +70,8 @@ OTRO_INSORD:        CMP [EAX], null
                         ADD EAX, SIG
                     JMP OTRO_INSORD
 
-SIGUE_INSORD:       MOV [ECX+VALOR], [EAX]
-                    MOV [EAX], [BP+12]
+SIGUE_INSORD:       MOV [ECX+SIG], [EAX]
+                    MOV [EAX], ECX
 
                     POP ECX
                     POP EBX
