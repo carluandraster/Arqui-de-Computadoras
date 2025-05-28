@@ -25,11 +25,13 @@ crear_nodo: PUSH BP
             PUSH 8
             CALL ALLOC
             ADD SP, 4
+            CMP EAX, NULL
+            JZ FIN_CREAR
 
             MOV [EAX+VALOR], [BP+8]
             MOV [EAX+SIG], null
 
-            MOV SP, BP
+FIN_CREAR:  MOV SP, BP
             POP BP
             RET
 
@@ -46,70 +48,36 @@ crear_nodo: PUSH BP
 ; DOCUMENTACIÓN
 ; [BP+8]: lista: nodoL** => *lista = [[BP+8]]
 ; [BP+12]: nuevo_nodo: nodoL* => nuevo_nodo->valor = [[BP+12]+VALOR] y nuevo_nodo->sig = [[BP+12]+SIG]
-; [BP-4]: variable local aux (doble puntero a nodo): nodoL** -> *aux = [[BP-4]]
-; EAX := [BP-4] => [EAX] = *aux => (*aux)->valor = [[EAX]+VALOR] y (*aux)->sig = [[EAX]+SIG](1)
-; EBX := [BP+12]+VALOR => [EBX] = [[BP+12]+VALOR] = nuevo_nodo->valor (2)
-; ECX := [BP+12]+SIG => [ECX] = [[BP+12]+SIG] = nuevo_nodo->sig (3)
-; EDX := [EAX]+VALOR => [EDX] = [[EAX]+VALOR] = (*aux)->valor (4)
-; EEX := [EAX]+SIG => [EEX] = [[EAX]+SIG] = (*aux)->sig (5)
+; EAX := iterador auxiliar (nodoL** aux) => [[EAX]+VALOR] = (*aux)->valor y [[EAX]+SIG] = (*aux)->sig
+; EBX = [EAX] = *aux => (*aux)->valor = [EBX+VALOR]
+; ECX = [BP+12] => nuevo_nodo->valor = [ECX+VALOR]
 
 inserta_ordenado:   PUSH BP
                     MOV BP, SP
-                    SUB SP, 4
                     PUSH EAX
                     PUSH EBX
                     PUSH ECX
-                    PUSH EDX
-                    PUSH EEX
 
-                    ; Borrar (se muestra [BP+12])
-                    mov edx, BP
-                    add edx, 12
-                    mov al, 1
-                    mov ch, 4
-                    mov cl, 1
-                    sys 2
-
-                    ; Por (2)
-                    MOV EBX, [BP+12]
-                    ADD EBX, VALOR
-
-                    ; Por (3)
-                    MOV ECX, [BP+12]
-                    ADD ECX, SIG
-
-                    MOV [BP-4], [BP+8]
+                    MOV EAX, [BP+8]
                     
-                    ; Por (1)
-OTRO_INSORD:        MOV EAX, [BP-4]
-
-                    CMP [EAX], null
+OTRO_INSORD:        CMP [EAX], null
                     JZ SIGUE_INSORD
 
-                    ; Por (4)
-                    MOV EDX, [EAX]
-                    ADD EDX, VALOR
+                    MOV EBX, [EAX]
+                    MOV ECX, [BP+12]
 
-                    ; Por (5)
-                    MOV EEX, [EAX]
-                    ADD EEX, SIG
-
-                    CMP [EAX+VALOR], [EBX]
-                    JZ SIGUE_INSORD
-                    CMP [EDX], [EBX]
+                    CMP [EBX+VALOR], [ECX+VALOR]
                     JNN SIGUE_INSORD
-                        MOV [BP-4], [EEX]
+                        MOV EAX, EBX
+                        ADD EAX, SIG
                     JMP OTRO_INSORD
 
-SIGUE_INSORD:       MOV [ECX], [EAX]
+SIGUE_INSORD:       MOV [ECX+VALOR], [EAX]
                     MOV [EAX], [BP+12]
 
-                    POP EEX
-                    POP EDX
                     POP ECX
                     POP EBX
                     POP EAX
-                    ADD SP, 4
                     MOV SP, BP
                     POP BP
                     RET
