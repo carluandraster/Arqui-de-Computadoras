@@ -75,30 +75,161 @@ FIN_AN:         POP EBX
                 POP BP
                 RET
 
+;----------------------------------------
+; imprime en in-order árbol binario de búsqueda (BST)
+; parámetros: 
+;  +8 puntero simple a root
+;----------------------------------------
+; invocación:
+; push  <*root>
+; call  inorder
+; add   sp,4
+; (no devuelve nada)
+;----------------------------------------
+
+inorder:        push    bp
+                mov     bp, sp
+                push    eax
+                push    ebx
+                push    ecx
+                push    edx
+
+                mov     ebx, [bp+8]     ; *root
+                
+                cmp     ebx, null
+                jz      inorder_end
+
+                ; llamo por izquierda
+                push    [ebx+left]
+                call    inorder
+                add     sp, 4
+
+                ; preparo en edx la dirección de la variable aux
+                mov     edx, ebx
+                add     edx, val    
+                mov     eax, 0x0001
+                mov     ecx, 0x0401
+                sys     0x0002
+
+                ; llamo por derecha
+                push    [ebx+right]
+                call    inorder
+                add     sp, 4
+
+inorder_end:    pop     edx
+                pop     ecx
+                pop     ebx
+                pop     eax
+                mov     sp, bp
+                pop     bp
+                ret
+
+;----------------------------------------
+; imprime en pre-order árbol binario de búsqueda (BST)
+; parámetros: 
+;  +8 puntero simple a root
+;----------------------------------------
+; invocación:
+; push  <*root>
+; call  preorder
+; add   sp,4
+; (no devuelve nada)
+;----------------------------------------
+
+preorder:       push    bp
+                mov     bp, sp
+                push    eax
+                push    ebx
+                push    ecx
+                push    edx
+
+                mov     ebx, [bp+8]     ; *root
+                
+                cmp     ebx, null
+                jz      preorder_end
+
+                ; preparo en edx la dirección de la variable aux
+                mov     edx, ebx
+                add     edx, val    
+                mov     eax, 0x0001
+                mov     ecx, 0x0401
+                sys     0x0002
+
+                ; llamo por izquierda
+                push    [ebx+left]
+                call    preorder
+                add     sp, 4
+
+                ; llamo por derecha
+                push    [ebx+right]
+                call    preorder
+                add     sp, 4
+
+preorder_end:   pop     edx
+                pop     ecx
+                pop     ebx
+                pop     eax
+                mov     sp, bp
+                pop     bp
+                ret
+
+;----------------------------------------
+; imprime en post-order árbol binario de búsqueda (BST)
+; parámetros: 
+;  +8 puntero simple a root
+;----------------------------------------
+; invocación:
+; push  <*root>
+; call  postorder
+; add   sp,4
+; (no devuelve nada)
+;----------------------------------------
+
+postorder:      push    bp
+                mov     bp, sp
+                push    eax
+                push    ebx
+                push    ecx
+                push    edx
+
+                mov     ebx, [bp+8]     ; *root
+                
+                cmp     ebx, null
+                jz      postorder_end
+
+                ; llamo por izquierda
+                push    [ebx+left]
+                call    postorder
+                add     sp, 4
+
+                ; llamo por derecha
+                push    [ebx+right]
+                call    postorder
+                add     sp, 4
+
+                ; preparo en edx la dirección de la variable aux
+                mov     edx, ebx
+                add     edx, val    
+                mov     eax, 0x0001
+                mov     ecx, 0x0401
+                sys     0x0002
+
+postorder_end:  pop     edx
+                pop     ecx
+                pop     ebx
+                pop     eax
+                mov     sp, bp
+                pop     bp
+                ret
+
+; La funcion esta solicita un número e informar si el mismo se encuentra o no en el árbol.
+
 ; INVOCACIÓN
-; PUSH <nodoA *>
-; CALL INORDEN
-; ADD SP, 4
-; No devuelve nada
+; PUSH <int>
+; PUSH <nodoA*>
+; CALL esta
+; ADD SP, 8
+; Devuelve resultado en EAX
 
 ; DOCUMENTACIÓN
-; [BP+8]: arbol A
-; AL: formato
-; EBX = [BP+8] => [EBX+campo] = A->campo
-; CX: cantidad
-; EDX: puntero
-
-INORDEN:    PUSH BP
-            MOV BP, SP
-            PUSH AL
-            PUSH EBX
-            PUSH CX
-            PUSH EDX
-
-            MOV EBX, [BP+8]
-
-            CMP [BP+8], NULL
-            JZ FIN_INORDEN
-                PUSH [EBX+IZQ]
-                CALL INORDEN
-                ADD SP, 4
+; [BP-4]: 
