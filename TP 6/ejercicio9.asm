@@ -198,12 +198,12 @@ postorder:      push    bp
                 jz      postorder_end
 
                 ; llamo por izquierda
-                push    [ebx+left]
+                push    [ebx+left]; A->izq
                 call    postorder
                 add     sp, 4
 
                 ; llamo por derecha
-                push    [ebx+right]
+                push    [ebx+right]; A->der
                 call    postorder
                 add     sp, 4
 
@@ -232,4 +232,87 @@ postorder_end:  pop     edx
 ; Devuelve resultado en EAX
 
 ; DOCUMENTACIÓN
-; [BP-4]: 
+; [BP+8]: arbol A
+; [BP+12]: numero
+; EAX: registro de respuesta (se pisa)
+; EBX = [BP+8] => [EBX+campo] = A->campo
+
+ESTA:   PUSH BP
+        MOV BP, SP
+        PUSH EBX
+
+        MOV EBX, [BP+8]
+
+        CMP EBX, NULL
+        JNZ ELSE_ESTA
+            MOV EAX, 0
+            JMP FIN_ESTA
+ELSE_ESTA:  CMP [BP+12], [EBX+CLAVE]
+            JN ESTA_IZQ
+            JP ESTA_DER
+            MOV EAX, 1
+            JMP FIN_ESTA
+ESTA_IZQ:   PUSH [BP+12]
+            PUSH [EBX+IZQ]
+            CALL ESTA
+            ADD SP, 8
+            JMP FIN_ESTA
+ESTA_DER:   PUSH [BP+12]
+            PUSH [EBX+DER]
+            CALL ESTA
+            ADD SP, 8
+
+FIN_ESTA:   POP EBX
+            MOV SP, BP
+            POP BP
+            RET
+
+; NIVELES recibe un árbol y devuelve la cantidad de niveles que tiene
+
+; INVOCACIÓN
+; PUSH <nodoA*>
+; CALL NIVELES
+; ADD SP, 4
+; En EAX devuelve resultado
+
+; DOCUMENTACIÓN
+; [BP+8]: arbol A
+; EAX: registro de resultado
+; EBX = [BP+8] => [EBX] = *A => [EBX+CAMPO] = A->campo
+; ECX = cantidad de niveles del subarbol izquierdo
+; EDX = cantidad de niveles del subarbol derecho
+
+NIVELES:    PUSH BP
+            MOV BP, SP
+            PUSH EBX
+            PUSH ECX
+            PUSH EDX
+
+            MOV EBX, [BP+8]
+            CMP EBX, NULL
+            JNZ ELSE_NIV1
+                MOV EAX, 0
+                JMP FIN_NIVELES
+            ; Recorrido postorden
+ELSE_NIV1:  PUSH [EBX+IZQ]
+            CALL NIVELES
+            ADD SP, 4
+            MOV ECX, EAX
+            PUSH [EBX+DER]
+            CALL NIVELES
+            ADD SP, 4
+            MOV EDX, EAX
+
+            CMP ECX, EDX
+            MOV EAX, 1
+            JNP ELSE_NIV2
+                ADD EAX, ECX
+                JMP FIN_NIVELES
+ELSE_NIV2:      ADD EAX, EDX
+
+FIN_NIVELES:    POP EDX
+                POP ECX
+                POP EBX
+                MOV SP, BP
+                POP BP
+                RET
