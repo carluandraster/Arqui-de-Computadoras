@@ -102,3 +102,59 @@ FIN__ENS:           POP ECX
                     MOV SP, BP
                     POP BP
                     RET
+
+; INVOCACIÓN
+; PUSH <nodoA **>
+; CALL PROMOVER_HIJO
+; ADD SP, 4
+; No devuelve nada
+
+; DOCUMENTACIÓN
+; [BP+8]: doble puntero a nodoA (o puntero simple a árbol)
+; EAX = [BP+8] = puntero a arbol A
+; EBX: iterador
+; ECX: registro auxiliar
+
+PROMOVER_HIJO:  PUSH BP
+                MOV BP, SP
+                PUSH EAX
+                PUSH EBX
+                PUSH ECX
+
+                MOV EAX, [BP+8]
+                CMP [EAX+HIJOS], NULL
+                JNZ ELSE_PH1
+                    MOV EAX, NULL
+                JMP FIN_PH
+                ; ECX := A->hijos->arbol->hijos
+ELSE_PH1:       MOV ECX, [EAX+HIJOS]
+                ADD ECX, ARBOL
+                MOV ECX, [ECX+HIJOS]
+                CMP ECX, NULL
+                JNZ ELSE_PH2
+                    MOV ECX, [EAX+HIJOS]
+                    ADD ECX, SIG
+                    MOV ECX, [ECX]
+                    MOV EAX, [EAX+HIJOS]
+                JMP FIN_PH
+ELSE_PH2:           MOV EBX, [EAX+HIJOS]
+                    ADD EBX, ARBOL
+                    MOV EBX, [EBX]
+                    ADD EBX, HIJOS
+                    MOV EBX, [EBX]
+OTRO_PH:            CMP [EBX+SIG], NULL
+                    JZ SIGUE_PH
+                        ADD EBX, [EBX+SIG]
+                    JMP OTRO_PH
+SIGUE_PH:           MOV [EBX+SIG], [EAX+HIJOS]
+                    ADD [EBX+SIG], SIG
+                    MOV ECX, [EBX+SIG]
+                    MOV [EBX+SIG], [ECX]
+                    MOV EAX, [EAX+HIJOS]
+
+FIN_PH:         POP ECX
+                POP EBX
+                POP EAX
+                MOV SP, BP
+                POP BP
+                RET
